@@ -95,7 +95,14 @@ const addBtn = document.getElementById("add-to-cart");
   });
   
   addBtn.addEventListener("click", () => { /* TODO Week 3 */ });
+  function buildLegend() {
+    const items = Object.values(VENUE.categories)
+      .map(c => `<li><span class="swatch" style="background:${c.color}"></span>${c.label} ${c.price} ${VENUE.currency}</li>`);
+    document.getElementById("legend").innerHTML = items.join("") +
+      `<li><span class="swatch unavailable"></span>Unavailable</li>
+       <li><span class="swatch in-cart"></span>In cart</li>`;
+  }
   buildVenue();
-
+  buildLegend();
   renderSeats();
   renderDetails();
