@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colosseum | Choose your seats</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header><h1>Colosseum</h1><p>Open-air arena. Choose your seats.</p></header>
+  <main>
+    <section class="map-area" aria-label="Venue map">
+      <div class="controls" role="toolbar" aria-label="Map controls">
+        <button type="button" id="zoom-in">Zoom +</button>
+        <button type="button" id="zoom-out">Zoom −</button>
+        <button type="button" id="move-up">Up</button>
+        <button type="button" id="move-down">Down</button>
+        <button type="button" id="move-left">Left</button>
+        <button type="button" id="move-right">Right</button>
+        <button type="button" id="reset-view">Reset view</button>
+      </div>
+      <div class="viewport">
+        <div id="venue-canvas">
+          <div id="venue-map"></div>
+        </div>
+      </div>
+      <ul id="legend"></ul>
+    </section>
+    <aside>
+      <section class="panel"><h2>Seat details</h2>
+        <div id="seat-details"></div>
+        <button type="button" id="add-to-cart" disabled>Add to cart</button>
+      </section>
+      <section class="panel"><h2>Your cart</h2>
+        <ul id="cart-items"></ul>
+        <p id="cart-total">Total: 0 AZN</p>
+      </section>
+    </aside>
+  </main>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
