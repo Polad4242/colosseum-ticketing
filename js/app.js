@@ -4,6 +4,8 @@ const state = {
   };
   const seatIndex = {}; 
   const mapEl = document.getElementById("venue-map");
+  const detailsEl = document.getElementById("seat-details");
+const addBtn = document.getElementById("add-to-cart");
   const rowLetter = i => String.fromCharCode(65 + i);
   function buildVenue() {
     mapEl.style.height = VENUE.height + "px";
@@ -62,6 +64,38 @@ const state = {
       btn.setAttribute("aria-pressed", s === "inspected");
     });
   }
+  function renderDetails() {
+    const seat = seatIndex[state.selectedId];
+    if (!seat) {
+      detailsEl.innerHTML = "<p>Select a seat on the map to see its details.</p>";
+      addBtn.disabled = true;
+      return;
+    }
+    const s = seatState(seat.id);
+    const notes = { available: "Available", inspected: "Available",
+                    "in-cart": "Already in your cart", unavailable: "Sold, cannot be selected" };
+    detailsEl.innerHTML = `
+      <h3>${seat.section}</h3>
+      <dl>
+        <dt>Row</dt><dd>${seat.row}</dd>
+        <dt>Seat</dt><dd>${seat.number}</dd>
+        <dt>Category</dt><dd>${seat.label}</dd>
+        <dt>Price</dt><dd>${seat.price} ${VENUE.currency}</dd>
+        <dt>Status</dt><dd>${notes[s]}</dd>
+      </dl>`;
+    addBtn.disabled = !(s === "inspected" || s === "available");
+  }
+  
+  mapEl.addEventListener("click", e => {
+    const btn = e.target.closest(".seat");
+    if (!btn) return;
+    state.selectedId = btn.dataset.id;
+    renderSeats();
+    renderDetails();
+  });
+  
+  addBtn.addEventListener("click", () => { /* TODO Week 3 */ });
   buildVenue();
 
   renderSeats();
+  renderDetails();
