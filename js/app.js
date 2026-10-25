@@ -48,4 +48,20 @@ const state = {
       mapEl.appendChild(secEl);
     });
   }
+  function seatState(id) {
+    if (seatIndex[id].unavailable) return "unavailable";
+    if (state.cart.includes(id)) return "in-cart";
+    if (state.selectedId === id) return "inspected";
+    return "available";
+  }
+  
+  function renderSeats() {
+    document.querySelectorAll(".seat").forEach(btn => {
+      const s = seatState(btn.dataset.id);
+      btn.className = "seat " + s;
+      btn.setAttribute("aria-pressed", s === "inspected");
+    });
+  }
   buildVenue();
+
+  renderSeats();
