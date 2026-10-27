@@ -94,8 +94,65 @@ const addBtn = document.getElementById("add-to-cart");
     renderDetails();
   });
   
-  addBtn.addEventListener("click", () => { /* TODO Week 3 */ });
-  function buildLegend() {
+  function addToCart() {
+    const id = state.selectedId;
+    if (!id) return;                                   // nothing inspected
+    if (seatIndex[id].unavailable) return;             // sold seats can't be added
+    if (state.cart.includes(id)) return;               // no duplicates
+    state.cart.push(id);
+    renderCart();
+    renderSeats();
+    renderDetails();
+  }
+  
+  addBtn.addEventListener("click", addToCart);
+  const cartListEl = document.getElementById("cart-items");
+const cartTotalEl = document.getElementById("cart-total");
+
+function renderCart() {
+  cartListEl.innerHTML = "";
+  let total = 0;
+
+  if (state.cart.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "empty";
+    empty.textContent = "Your cart is empty.";
+    cartListEl.appendChild(empty);
+  }
+
+  state.cart.forEach(id => {
+    const seat = seatIndex[id];
+    total += seat.price;
+
+    const li = document.createElement("li");
+    const info = document.createElement("span");
+    info.textContent = `${seat.section}, Row ${seat.row}, Seat ${seat.number}: ${seat.price} ${VENUE.currency}`;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "Remove";
+    removeBtn.dataset.id = id;
+
+    li.appendChild(info);
+    li.appendChild(removeBtn);
+    cartListEl.appendChild(li);
+  });
+
+  cartTotalEl.textContent = `Total: ${total} ${VENUE.currency}`;
+}
+
+function removeFromCart(id) {
+  state.cart = state.cart.filter(seatId => seatId !== id);
+  renderCart();
+  renderSeats();
+  renderDetails();
+}
+
+cartListEl.addEventListener("click", e => {
+  const btn = e.target.closest("button[data-id]");
+  if (btn) removeFromCart(btn.dataset.id);
+});
+    function buildLegend() {
     const items = Object.values(VENUE.categories)
       .map(c => `<li><span class="swatch" style="background:${c.color}"></span>${c.label} ${c.price} ${VENUE.currency}</li>`);
     document.getElementById("legend").innerHTML = items.join("") +
@@ -148,3 +205,4 @@ document.getElementById("reset-view").addEventListener("click", resetView);
   buildLegend();
   renderSeats();
   renderDetails();
+  renderCart();
