@@ -96,10 +96,11 @@ const addBtn = document.getElementById("add-to-cart");
   
   function addToCart() {
     const id = state.selectedId;
-    if (!id) return;                                   // nothing inspected
-    if (seatIndex[id].unavailable) return;             // sold seats can't be added
-    if (state.cart.includes(id)) return;               // no duplicates
+    if (!id) return;
+    if (seatIndex[id].unavailable) return;
+    if (state.cart.includes(id)) return;
     state.cart.push(id);
+    saveCart();
     renderCart();
     renderSeats();
     renderDetails();
@@ -143,6 +144,7 @@ function renderCart() {
 
 function removeFromCart(id) {
   state.cart = state.cart.filter(seatId => seatId !== id);
+  saveCart();
   renderCart();
   renderSeats();
   renderDetails();
@@ -152,6 +154,31 @@ cartListEl.addEventListener("click", e => {
   const btn = e.target.closest("button[data-id]");
   if (btn) removeFromCart(btn.dataset.id);
 });
+
+const STORAGE_KEY = "colosseum-cart";
+
+function saveCart() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.cart));
+  } catch (err) {
+    console.warn("Could not save cart", err);
+  }
+}
+
+function loadCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(saved)) return;
+    state.cart = saved.filter((id, i) =>
+      seatIndex[id] &&
+      !seatIndex[id].unavailable &&
+      saved.indexOf(id) === i
+    );
+  } catch (err) {
+    state.cart = [];
+  }
+}
+
     function buildLegend() {
     const items = Object.values(VENUE.categories)
       .map(c => `<li><span class="swatch" style="background:${c.color}"></span>${c.label} ${c.price} ${VENUE.currency}</li>`);
@@ -203,6 +230,7 @@ document.getElementById("move-right").addEventListener("click", () => moveBy(-MO
 document.getElementById("reset-view").addEventListener("click", resetView);
   buildVenue();
   buildLegend();
+  loadCart();
   renderSeats();
   renderDetails();
   renderCart();
