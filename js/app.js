@@ -102,6 +102,48 @@ const addBtn = document.getElementById("add-to-cart");
       `<li><span class="swatch unavailable"></span>Unavailable</li>
        <li><span class="swatch in-cart"></span>In cart</li>`;
   }
+  const canvasEl = document.getElementById("venue-canvas");
+const view = { x: 0, y: 0, zoom: 1 };
+const ZOOM_MIN = 0.5;
+const ZOOM_MAX = 2.5;
+const ZOOM_STEP = 0.25;
+const MOVE_STEP = 60;
+const MOVE_LIMIT = 500;
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function applyView() {
+  canvasEl.style.transform =
+    `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`;
+}
+
+function zoomBy(amount) {
+  view.zoom = clamp(Math.round((view.zoom + amount) * 100) / 100, ZOOM_MIN, ZOOM_MAX);
+  applyView();
+}
+
+function moveBy(dx, dy) {
+  view.x = clamp(view.x + dx, -MOVE_LIMIT, MOVE_LIMIT);
+  view.y = clamp(view.y + dy, -MOVE_LIMIT, MOVE_LIMIT);
+  applyView();
+}
+
+function resetView() {
+  view.x = 0;
+  view.y = 0;
+  view.zoom = 1;
+  applyView();
+}
+
+document.getElementById("zoom-in").addEventListener("click", () => zoomBy(ZOOM_STEP));
+document.getElementById("zoom-out").addEventListener("click", () => zoomBy(-ZOOM_STEP));
+document.getElementById("move-up").addEventListener("click", () => moveBy(0, MOVE_STEP));
+document.getElementById("move-down").addEventListener("click", () => moveBy(0, -MOVE_STEP));
+document.getElementById("move-left").addEventListener("click", () => moveBy(MOVE_STEP, 0));
+document.getElementById("move-right").addEventListener("click", () => moveBy(-MOVE_STEP, 0));
+document.getElementById("reset-view").addEventListener("click", resetView);
   buildVenue();
   buildLegend();
   renderSeats();
