@@ -43,7 +43,6 @@ function buildVenue() {
         btn.className = "seat available";
         btn.dataset.id = id;
         btn.style.setProperty("--cat", cat.color);
-        btn.setAttribute("aria-label", `${sec.name}, row ${seat.row}, seat ${n}, ${cat.price} ${VENUE.currency}`);
         secEl.appendChild(btn);
       }
     }
@@ -58,11 +57,20 @@ function seatState(id) {
   return "available";
 }
 
+function seatLabel(seat, s) {
+  const status = { available: "available", inspected: "selected",
+                   "in-cart": "in your cart", unavailable: "sold" }[s];
+  return `${seat.section}, row ${seat.row}, seat ${seat.number}, ${seat.price} ${VENUE.currency}, ${status}`;
+}
+
 function renderSeats() {
   document.querySelectorAll(".seat").forEach(btn => {
-    const s = seatState(btn.dataset.id);
+    const seat = seatIndex[btn.dataset.id];
+    const s = seatState(seat.id);
     btn.className = "seat " + s;
     btn.setAttribute("aria-pressed", s === "inspected");
+    btn.setAttribute("aria-label", seatLabel(seat, s));
+    btn.setAttribute("aria-disabled", s === "unavailable");
   });
 }
 
@@ -136,6 +144,7 @@ function renderCart() {
     removeBtn.type = "button";
     removeBtn.textContent = "Remove";
     removeBtn.dataset.id = id;
+    removeBtn.setAttribute("aria-label", `Remove ${seat.section}, row ${seat.row}, seat ${seat.number}`);
 
     li.appendChild(info);
     li.appendChild(removeBtn);
@@ -177,8 +186,10 @@ function loadCart() {
       !seatIndex[id].unavailable &&
       saved.indexOf(id) === i
     );
+    saveCart();
   } catch (err) {
     state.cart = [];
+    saveCart();
   }
 }
 
@@ -247,6 +258,9 @@ document.getElementById("move-down").addEventListener("click", () => moveBy(0, -
 document.getElementById("move-left").addEventListener("click", () => moveBy(MOVE_STEP, 0));
 document.getElementById("move-right").addEventListener("click", () => moveBy(-MOVE_STEP, 0));
 document.getElementById("reset-view").addEventListener("click", resetView);
+
+detailsEl.setAttribute("aria-live", "polite");
+cartListEl.setAttribute("aria-live", "polite");
 
 buildVenue();
 buildLegend();
