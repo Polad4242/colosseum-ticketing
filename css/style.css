@@ -13,8 +13,9 @@ button { font:inherit; cursor:pointer; }
 #add-to-cart:disabled { background:#3a3f6b; color:var(--muted); cursor:not-allowed; }
 button:focus-visible { outline:2px solid #fff; outline-offset:2px; }
 
-/* Viewport hides overflow; canvas gets moved/scaled in Week 3 */
-.viewport { overflow:hidden; background:#0e1022; border-radius:10px; height:620px; position:relative; }
+.viewport { overflow:hidden; background:#0e1022; border-radius:10px; height:620px; position:relative; cursor:grab; user-select:none; }
+.viewport.dragging { cursor:grabbing; }
+.viewport.dragging .seat { pointer-events:none; }
 #venue-canvas { width:760px; position:absolute; top:10px; left:50%; margin-left:-380px; transform-origin:center top; }
 #venue-map { position:relative; margin-top:1rem; }
 .landmark { position:absolute; display:flex; align-items:center; justify-content:center; }

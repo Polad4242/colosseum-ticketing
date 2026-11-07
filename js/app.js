@@ -259,6 +259,53 @@ document.getElementById("move-left").addEventListener("click", () => moveBy(MOVE
 document.getElementById("move-right").addEventListener("click", () => moveBy(-MOVE_STEP, 0));
 document.getElementById("reset-view").addEventListener("click", resetView);
 
+const WHEEL_STEP = 0.1;
+const DRAG_THRESHOLD = 5;
+let dragStart = null;
+let dragging = false;
+let suppressClick = false;
+
+viewportEl.addEventListener("wheel", e => {
+  e.preventDefault();
+  zoomBy(e.deltaY < 0 ? WHEEL_STEP : -WHEEL_STEP);
+}, { passive: false });
+
+viewportEl.addEventListener("pointerdown", e => {
+  if (e.pointerType !== "mouse" || e.button !== 0) return;
+  suppressClick = false;
+  dragStart = { x: e.clientX, y: e.clientY, viewX: view.x, viewY: view.y };
+});
+
+window.addEventListener("pointermove", e => {
+  if (!dragStart) return;
+  const dx = e.clientX - dragStart.x;
+  const dy = e.clientY - dragStart.y;
+  if (!dragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+  dragging = true;
+  viewportEl.classList.add("dragging");
+  view.x = clamp(dragStart.viewX + dx, -MOVE_LIMIT, MOVE_LIMIT);
+  view.y = clamp(dragStart.viewY + dy, -MOVE_LIMIT, MOVE_LIMIT);
+  applyView();
+});
+
+window.addEventListener("pointerup", () => {
+  if (dragging) {
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 0);
+  }
+  dragStart = null;
+  dragging = false;
+  viewportEl.classList.remove("dragging");
+});
+
+viewportEl.addEventListener("click", e => {
+  if (suppressClick) {
+    e.stopPropagation();
+    e.preventDefault();
+    suppressClick = false;
+  }
+}, true);
+
 detailsEl.setAttribute("aria-live", "polite");
 cartListEl.setAttribute("aria-live", "polite");
 
